@@ -19,6 +19,8 @@ class KrogerCLI(BaseCLI):
         "config-file": Path.home() / ".kroger.toml",
         # toml [section-name].
         "config-name": "kroger",
+        # distribution name, not importable package name
+        "dist-name": "rlane-kroger",
         # archive directory.
         "archive-path": Path.home() / "kroger-payslips",
         # signon.
