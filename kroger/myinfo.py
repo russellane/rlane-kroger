@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 
 
 class KrogerMyInfoCmd(BaseCmd):
-    """Open browser, signon to Kroger MyInfo, and navigate to `Payslips` page."""
+    """Open browser, login to Kroger MyInfo, and navigate to `Payslips` page."""
 
     def init_command(self) -> None:
         """Docstring."""
@@ -19,9 +19,8 @@ class KrogerMyInfoCmd(BaseCmd):
             help=KrogerMyInfoCmd.__doc__,
             description=self.cli.dedent(
                 f"""
-            The `%(prog)s` command opens a browser, and logs in to
-            Kroger's MyInfo application, and navigates to the `Payslips`
-            page.
+            The `%(prog)s` command opens a browser, logs in to Kroger's
+            MyInfo application, and navigates to the `Payslips` page.
 
             User should now download any new payslips into their
             `~/Downloads` folder.  The filenames of the payslips shown

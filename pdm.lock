@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:82e5b5eee31b42d3117b7c20c82e0bdcff18bd93f94c59e80a8d46311578389e"
+content_hash = "sha256:7d639a7723d08bc7312fca9d02d0a8ee85358cf825d3f996ba48970ff5e22117"
 
 [[package]]
 name = "ansicolors"
@@ -748,16 +748,13 @@ files = [
 name = "rlane-libcli"
 version = "1.0.3"
 requires_python = ">=3.10"
+path = "../libcli"
 summary = "Command line interface framework"
 groups = ["default"]
 dependencies = [
     "ansicolors>=1.1.8",
-    "argcomplete>=2.0.0",
+    "argcomplete>=3.3.0",
     "tomli>=2.0.1",
-]
-files = [
-    {file = "rlane-libcli-1.0.3.tar.gz", hash = "sha256:2d0139f3b09c62b2645adf92e2954dee843cecf53eee8268d98e7663ef30f634"},
-    {file = "rlane_libcli-1.0.3-py3-none-any.whl", hash = "sha256:80db0db729434d13a70ac4d0d1f1e6c6c1485b7e8918129734524a7a4ef151c1"},
 ]
 
 [[package]]

@@ -27,7 +27,7 @@ class KrogerArchiveCmd(BaseCmd):
             modification-time, to reflect the payslip's `paydate`.
 
             Configuration file `~/.kroger.toml` defines:
-                archive-path = {self.cli.config["archive-path"]}
+                archive-path = `{self.cli.config["archive-path"]}`
                 """
             ),
         )
