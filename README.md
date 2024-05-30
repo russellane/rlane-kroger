@@ -8,10 +8,10 @@ Kroger `payslip-pdf` tools; signon, parse, print, and archive payslips.
 
 Specify one of:
   COMMAND
-    myinfo              Open browser, signon to Kroger MyInfo, and navigate to
+    myinfo              Open browser, login to Kroger MyInfo, and navigate to
                         `Payslips` page.
-    mytime              Open browser, signon to Kroger MyTime, and extract
-                        `Schedule`.
+    mytime              Open browser, login to Kroger MyTime, extract
+                        `Schedule`, and print `gcalcli` commands.
     archive             Copy and rename `payslip-pdf` to reflect its
                         `paydate`.
     print               Parse and print select fields from a `payslip-pdf`
@@ -33,9 +33,8 @@ General options:
 ```
 usage: kroger myinfo [-h]
 
-The `kroger myinfo` command opens a browser, and logs in to
-Kroger's MyInfo application, and navigates to the `Payslips`
-page.
+The `kroger myinfo` command opens a browser, logs in to Kroger's
+MyInfo application, and navigates to the `Payslips` page.
 
 User should now download any new payslips into their
 `~/Downloads` folder.  The filenames of the payslips shown
@@ -51,7 +50,7 @@ See the `archive` command to extract the `paydate` from a
 downloaded file, and embed the paydate into the name of an
 archived copy of the file.
 
-Configuration file `/Users/russe/.kroger.toml` defines these variables:
+Configuration file `~/.kroger.toml` defines these variables:
     myinfo-url = `https://myinfo.kroger.com`
     sso-user = "*******"
     sso-password = "********"
@@ -64,11 +63,13 @@ options:
 ```
 usage: kroger mytime [-h]
 
-The `kroger mytime` command opens a browser, and logs in to
-Kroger's MyTime application.
+The `kroger mytime` command opens a browser, logs in to Kroger's
+MyTime application, extracts the `schedule`, and prints `gcalcli`
+commands to create events in the configured google calendar.
 
-Configuration file `/Users/russe/.kroger.toml` defines these variables:
+Configuration file `~/.kroger.toml` defines these variables:
     mytime-url = `https://kroger-sso.prd.mykronos.com/`
+    google-calendar = "*******"
     sso-user = "*******"
     sso-password = "********"
 
@@ -85,7 +86,7 @@ to `archive-path`, naming the copy, and touching its
 modification-time, to reflect the payslip's `paydate`.
 
 Configuration file `~/.kroger.toml` defines:
-    archive-path = /Users/russe/Documents/Finances/Kroger-Pay-Stubs
+    archive-path = `~/Documents/Finances/Kroger-Pay-Stubs`
 
 positional arguments:
   PAYSLIP-PDF  List of one or more Kroger payslip `.pdf` files.

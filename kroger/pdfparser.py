@@ -81,7 +81,8 @@ class KrogerPdfParser:
             "has_sunday_pay": False,
             "has_reg_hours_retro": False,
             "has_night_premium": False,
-            "total_hours_worked": False,
+            "total_hours_worked": None,
+            "sick_hours_available": None,
         }
         self.payslip["payment_date"] = datetime.strptime(
             self.payslip["payment_date"], "%m/%d/%y"
@@ -270,7 +271,10 @@ class KrogerPdfParser:
             self.assert_eq(self.lines.pop(0), "Tax Deductions")
             self.assert_eq(self.lines.pop(0), "")
 
-        self.assert_eq(self.lines.pop(0), "Name")
+        # self.assert_eq(self.lines.pop(0), "Name")
+        if self.lines[0] != "Name":
+            self.lines.pop(0)
+            self.lines.pop(0)
 
         self.tax_deductions = []
         while self.lines[0]:
@@ -319,9 +323,20 @@ class KrogerPdfParser:
             if self.lines[0].startswith("Total Hours Worked: "):
                 break
 
+            self.lines.pop(0)
+
         # Total Hours Worked: 2.50
         self.payslip["total_hours_worked"] = float(self.lines.pop(0).split()[3])  # 4th word
         self.assert_eq(self.lines.pop(0), "")
+
+        # -------------------------------------------------------------------------------
+
+        # Sick Hours Available: 0.00
+        if self.lines[0].startswith("Sick Hours Available: "):
+            self.payslip["sick_hours_available"] = float(
+                self.lines.pop(0).split()[3]
+            )  # 4th word
+            self.assert_eq(self.lines.pop(0), "")
 
         # -------------------------------------------------------------------------------
 

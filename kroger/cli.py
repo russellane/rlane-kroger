@@ -1,6 +1,5 @@
 """Command line interface."""
 
-from pathlib import Path
 from typing import List, Optional
 
 from libcli import BaseCLI
@@ -16,16 +15,17 @@ class KrogerCLI(BaseCLI):
 
     config = {
         # name of config file.
-        "config-file": Path.home() / ".kroger.toml",
+        "config-file": "~/.kroger.toml",
         # toml [section-name].
         "config-name": "kroger",
         # distribution name, not importable package name
         "dist-name": "rlane-kroger",
         # archive directory.
-        "archive-path": Path.home() / "kroger-payslips",
+        "archive-path": "~/kroger-payslips",
         # signon.
         "myinfo-url": "",
         "mytime-url": "",
+        "google-calendar": "",
         "sso-user": "",
         "sso-password": "",
     }

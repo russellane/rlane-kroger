@@ -1,6 +1,5 @@
 """Kroger payslip-pdf tools; signon, parse, print, and archive payslips."""
 
-import pdb
 import re
 from pprint import pprint
 from time import localtime, mktime, sleep, strftime
@@ -73,7 +72,7 @@ class Shift:
 
 
 class KrogerMyTimeCmd(BaseCmd):
-    """Open browser, signon to Kroger MyTime, and extract `Schedule`."""
+    """Open browser, login to Kroger MyTime, extract `Schedule`, and print `gcalcli` commands."""
 
     testing: bool = False
 
@@ -85,11 +84,13 @@ class KrogerMyTimeCmd(BaseCmd):
             help=KrogerMyTimeCmd.__doc__,
             description=self.cli.dedent(
                 f"""
-            The `%(prog)s` command opens a browser, and logs in to
-            Kroger's MyTime application.
+            The `%(prog)s` command opens a browser, logs in to Kroger's
+            MyTime application, extracts the `schedule`, and prints `gcalcli`
+            commands to create events in the configured google calendar.
 
             Configuration file `{self.cli.config["config-file"]}` defines these variables:
                 mytime-url = `{self.cli.config["mytime-url"]}`
+                google-calendar = "*******"
                 sso-user = "*******"
                 sso-password = "********"
                 """,
@@ -111,7 +112,7 @@ class KrogerMyTimeCmd(BaseCmd):
                 "gcalcli",
                 "add",
                 "--calendar",
-                "russel.lane@gmail.com",
+                self.cli.config["google-calendar"],
                 "--title",
                 repr("Fry's"),
                 "--when",
@@ -144,7 +145,6 @@ class KrogerMyTimeCmd(BaseCmd):
         schedule = driver.find_element(by=By.XPATH, value="//ng-myschedule-list")
         lines = schedule.text.splitlines()
 
-        pdb.set_trace()  # pylint: disable=forgotten-debug-statement
         driver.quit()
 
         return lines
@@ -160,6 +160,9 @@ class KrogerMyTimeCmd(BaseCmd):
         "Sun",
         "26",
         "1:00 PM-7:30 PM [6.50]",
+        "Mon",
+        "27",
+        "9:00 AM-12:00 PM [3.00]",
         "Mon",
         "27",
         "3:45 PM-7:45 PM [4.00]",
@@ -181,12 +184,11 @@ class KrogerMyTimeCmd(BaseCmd):
         """Returns a list of `Shift`s from the given `schedule`."""
 
         shifts = []
+        _t = localtime()
+        year, mon = _t.tm_year, _t.tm_mon
 
-        # The first 4-6 line shift in the schedule is for `today`.
-        now = localtime()
-        date = mktime((now.tm_year, now.tm_mon, now.tm_mday, 0, 0, 0, 0, 0, 0))
-
-        for _i in range(0, 7):
+        first = True
+        while schedule:
             dayname = schedule.pop(0)
             daynum = int(schedule.pop(0))
             timestr = schedule.pop(0)
@@ -198,11 +200,16 @@ class KrogerMyTimeCmd(BaseCmd):
 
             print(f"# {dayname!r} {daynum!r} {timestr!r}")
 
-            assert daynum == localtime(date).tm_mday
+            if not first and daynum == 1:  # new month.
+                if mon < 12:
+                    mon += 1
+                else:
+                    mon = 1
+                    year += 1
+            date = mktime((year, mon, daynum, 0, 0, 0, 0, 0, 0))
+            first = False
 
             if timestr != "You have nothing planned.":
                 shifts.append(Shift(date, dayname, daynum, timestr))
-
-            date += 86400
 
         return shifts

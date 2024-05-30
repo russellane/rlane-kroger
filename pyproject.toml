@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-keywords = ["kroger", "python"]
+keywords = ["kroger", "myinfo", "mytime", "python"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: End Users/Desktop",
@@ -17,9 +17,9 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "rlane-libcli>=1.0.3",
     "pdfminer-six>=20231228",
     "selenium>=4.21.0",
+    "rlane-libcli @ file:///${PROJECT_ROOT}/../libcli",
 ]
 
 [project.urls]
