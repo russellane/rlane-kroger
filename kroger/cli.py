@@ -56,7 +56,10 @@ class KrogerCLI(BaseCLI):
             self.parser.print_help()
             self.parser.exit(2, "error: Missing COMMAND\n")
 
-        self.options.cmd()
+        try:
+            self.options.cmd()
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            self.parser.exit(1, str(e))
 
 
 def main(args: Optional[List[str]] = None) -> None:
