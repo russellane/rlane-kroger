@@ -1,5 +1,13 @@
 # russellane/Python.mk
 
+ifeq ("$(PROJECT)","")
+	$(error PROJECT is not defined)
+endif
+
+ifeq ("$(PACKAGE_NAME)","")
+	PACKAGE_NAME := $(PROJECT)
+endif
+
 build::		__pypackages__ tags lint test doc
 		pdm build
 
@@ -21,8 +29,8 @@ publish_prod::
 		twine upload --verbose -r pypi dist/*
 
 install::
-		-pipx uninstall $(PROJECT)
-		pipx install $(PROJECT)
+		-pipx uninstall $(PACKAGE_NAME)
+		pipx install $(PACKAGE_NAME)
 
 __pypackages__:
 		pdm install
