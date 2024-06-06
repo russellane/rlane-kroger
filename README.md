@@ -22,7 +22,8 @@ General options:
   -H, --long-help       Show help for all commands and exit.
   -v, --verbose         `-v` for detailed output and `-vv` for more detailed.
   -V, --version         Print version number and exit.
-  --config FILE         Use config `FILE` (default: `~/.kroger.toml`).
+  --config FILE         Use config `FILE` (default: `[Errno 2] No such file or
+                        directory: '~/.kroger.toml'`).
   --print-config        Print effective config and exit.
   --print-url           Print project url and exit.
   --completion [SHELL]  Print completion scripts for `SHELL` and exit
@@ -50,8 +51,8 @@ See the `archive` command to extract the `paydate` from a
 downloaded file, and embed the paydate into the name of an
 archived copy of the file.
 
-Configuration file `~/.kroger.toml` defines these variables:
-    myinfo-url = `https://myinfo.kroger.com`
+Configuration file `[Errno 2] No such file or directory: '~/.kroger.toml'` defines these variables:
+    myinfo-url = ``
     sso-user = "*******"
     sso-password = "********"
 
@@ -67,8 +68,8 @@ The `kroger mytime` command opens a browser, logs in to Kroger's
 MyTime application, extracts the `schedule`, and prints `gcalcli`
 commands to create events in the configured google calendar.
 
-Configuration file `~/.kroger.toml` defines these variables:
-    mytime-url = `https://kroger-sso.prd.mykronos.com/`
+Configuration file `[Errno 2] No such file or directory: '~/.kroger.toml'` defines these variables:
+    mytime-url = ``
     google-calendar = "*******"
     sso-user = "*******"
     sso-password = "********"
@@ -86,7 +87,7 @@ to `archive-path`, naming the copy, and touching its
 modification-time, to reflect the payslip's `paydate`.
 
 Configuration file `~/.kroger.toml` defines:
-    archive-path = `~/Documents/Finances/Kroger-Pay-Stubs`
+    archive-path = `~/kroger-payslips`
 
 positional arguments:
   PAYSLIP-PDF  List of one or more Kroger payslip `.pdf` files.

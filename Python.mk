@@ -1,13 +1,5 @@
 # russellane/Python.mk
 
-ifeq ("$(PROJECT)","")
-	$(error PROJECT is not defined)
-endif
-
-ifeq ("$(PACKAGE_NAME)","")
-	PACKAGE_NAME := $(PROJECT)
-endif
-
 build::		__pypackages__ tags lint test doc
 		pdm build
 
@@ -28,9 +20,10 @@ publish_test::
 publish_prod::
 		twine upload --verbose -r pypi dist/*
 
+PROJECT_NAME := $(shell sed -ne 's/^name = "\(.*\)"$$/\1/p' pyproject.toml)
 install::
-		-pipx uninstall $(PACKAGE_NAME)
-		pipx install $(PACKAGE_NAME)
+		-pipx uninstall $(PROJECT_NAME)
+		pipx install $(PROJECT_NAME)
 
 __pypackages__:
 		pdm install

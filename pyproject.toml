@@ -18,8 +18,8 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "pdfminer-six>=20231228",
+    "rlane-libcli>=1.0.3",
     "selenium>=4.21.0",
-    "rlane-libcli @ file:///${PROJECT_ROOT}/../libcli",
 ]
 
 [project.urls]
