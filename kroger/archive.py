@@ -59,10 +59,11 @@ class KrogerArchiveCmd(BaseCmd):
         and touch atime and mtime to `payment_date`.
         """
 
-        self.cli.config["archive-path"].mkdir(parents=True, exist_ok=True)  # mkdir -p
+        archive_path = Path(self.cli.config["archive-path"]).expanduser()
+        archive_path.mkdir(parents=True, exist_ok=True)  # mkdir -p
 
         filename = datetime.strftime(payment_date, "Kroger-%Y-%m-%d.pdf")
-        target = self.cli.config["archive-path"] / filename
+        target = archive_path / filename
         shutil.copy(payslip_pdf, target)
 
         payment_timestamp = int(payment_date.timestamp())
