@@ -130,17 +130,23 @@ class KrogerMyTimeCmd(BaseCmd):
         options = webdriver.ChromeOptions()
         driver = webdriver.Chrome(options=options)
         driver.get(self.cli.config["mytime-url"])
-        sleep(2)
+        sleep(5)
 
-        user = driver.find_element(by=By.NAME, value="USER")
+        user = driver.find_element(by=By.NAME, value="submittedIdentifier")
         user.send_keys(self.cli.config["sso-user"])
 
-        password = driver.find_element(by=By.NAME, value="PASSWORD")
+        # submit = driver.find_element(by=By.XPATH, value="//input[@type='submit']")
+        submit = driver.find_element(by=By.XPATH, value="//button[@id='btnSignIn']/div")
+        submit.click()
+        sleep(5)
+
+        password = driver.find_element(by=By.NAME, value="password")
         password.send_keys(self.cli.config["sso-password"])
 
-        submit = driver.find_element(by=By.XPATH, value="//input[@type='submit']")
+        # submit = driver.find_element(by=By.XPATH, value="//input[@type='submit']")
+        submit = driver.find_element(by=By.XPATH, value="//button[@id='btnSignIn']/div")
         submit.click()
-        sleep(15)
+        sleep(10)
 
         schedule = driver.find_element(by=By.XPATH, value="//ng-myschedule-list")
         lines = schedule.text.splitlines()
