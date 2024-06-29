@@ -50,29 +50,30 @@ class KrogerMyInfoCmd(BaseCmd):
         options = webdriver.ChromeOptions()
         driver = webdriver.Chrome(options=options)
         driver.get(self.cli.config["myinfo-url"])
-        driver.implicitly_wait(0.8)
+        sleep(5)
 
-        element = driver.find_element(By.ID, "ssoBtn")
-        element.click()
+        user = driver.find_element(by=By.NAME, value="submittedIdentifier")
+        user.send_keys(self.cli.config["sso-user"])
 
-        if self.cli.config["sso-user"] and self.cli.config["sso-password"]:
+        # submit = driver.find_element(by=By.XPATH, value="//input[@type='submit']")
+        submit = driver.find_element(by=By.XPATH, value="//button[@id='btnSignIn']/div")
+        submit.click()
+        sleep(5)
 
-            user = driver.find_element(by=By.NAME, value="USER")
-            user.send_keys(self.cli.config["sso-user"])
+        password = driver.find_element(by=By.NAME, value="password")
+        password.send_keys(self.cli.config["sso-password"])
 
-            password = driver.find_element(by=By.NAME, value="PASSWORD")
-            password.send_keys(self.cli.config["sso-password"])
+        # submit = driver.find_element(by=By.XPATH, value="//input[@type='submit']")
+        submit = driver.find_element(by=By.XPATH, value="//button[@id='btnSignIn']/div")
+        submit.click()
+        sleep(10)
 
-            submit = driver.find_element(by=By.XPATH, value="//input[@type='submit']")
-            submit.click()
+        pay = driver.find_element(by=By.ID, value="itemNode_my_information_pay_0")
+        pay.click()
 
-            sleep(2)
-            pay = driver.find_element(by=By.ID, value="itemNode_my_information_pay_0")
-            pay.click()
-
-            sleep(2)
-            payslips = driver.find_element(By.XPATH, value="//a[contains(., 'My Payslips')]")
-            payslips.click()
+        sleep(2)
+        payslips = driver.find_element(By.XPATH, value="//a[contains(., 'My Payslips')]")
+        payslips.click()
 
         pdb.set_trace()  # pylint: disable=forgotten-debug-statement
         driver.quit()
