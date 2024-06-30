@@ -215,7 +215,13 @@ class KrogerMyTimeCmd(BaseCmd):
             date = mktime((year, mon, daynum, 0, 0, 0, 0, 0, 0))
             first = False
 
-            if timestr != "You have nothing planned.":
-                shifts.append(Shift(date, dayname, daynum, timestr))
+            while timestr != "You have nothing planned.":
+                try:
+                    shifts.append(Shift(date, dayname, daynum, timestr))
+                    break
+                except RuntimeError:
+                    # Perhaps a holiday message, like: "Independence Day".
+                    timestr = schedule.pop(0)
+                    print(f"# {dayname!r} {daynum!r} {timestr!r}")
 
         return shifts
