@@ -61,7 +61,7 @@ options:
 
 ## kroger mytime
 ```
-usage: kroger mytime [-h]
+usage: kroger mytime [-h] [--test1] [--test2] [--test3]
 
 The `kroger mytime` command opens a browser, logs in to Kroger's
 MyTime application, extracts the `schedule`, and prints `gcalcli`
@@ -75,6 +75,9 @@ Configuration file `~/.kroger.toml` defines these variables:
 
 options:
   -h, --help  Show this help message and exit.
+  --test1     Run test #1.
+  --test2     Run test #2.
+  --test3     Run test #3.
 ```
 
 ## kroger archive

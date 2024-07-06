@@ -1,7 +1,7 @@
-"""Kroger payslip-pdf tools; signon, parse, print, and archive payslips."""
+"""Kroger MyTime command."""
 
+import contextlib
 import re
-from pprint import pprint
 from time import localtime, mktime, sleep, strftime
 
 from libcli import BaseCmd
@@ -11,8 +11,6 @@ from selenium.webdriver.common.by import By
 
 class Shift:
     """A work shift."""
-
-    # pylint: disable=too-few-public-methods
 
     # Parse strings like: "1:15 PM-8:00 PM [6.75]"
 
@@ -36,7 +34,7 @@ class Shift:
 
         m = re.match(self.pattern, timestr)
         if not m:
-            raise RuntimeError(f"timestr={timestr!r}")
+            raise ValueError(f"Can't parse {timestr!r}")
 
         fr_hh = int(m["fr_hh"])
         fr_mm = int(m["fr_mm"])
@@ -53,6 +51,9 @@ class Shift:
 
         to_minutes = (to_hh * 60) + to_mm
         self.duration = to_minutes - fr_minutes
+
+    def __eq__(self, other):
+        return self.date == other.date and self.duration == other.duration
 
     def __repr__(self) -> str:
 
@@ -74,12 +75,10 @@ class Shift:
 class KrogerMyTimeCmd(BaseCmd):
     """Open browser, login to Kroger MyTime, extract `Schedule`, and print `gcalcli` commands."""
 
-    testing: bool = False
-
     def init_command(self) -> None:
         """Docstring."""
 
-        self.add_subcommand_parser(
+        parser = self.add_subcommand_parser(
             "mytime",
             help=KrogerMyTimeCmd.__doc__,
             description=self.cli.dedent(
@@ -97,17 +96,47 @@ class KrogerMyTimeCmd(BaseCmd):
             ),
         )
 
+        parser.add_argument(
+            "--test1",
+            action="store_true",
+            help="Run test #1",
+        )
+
+        parser.add_argument(
+            "--test2",
+            action="store_true",
+            help="Run test #2",
+        )
+
+        parser.add_argument(
+            "--test3",
+            action="store_true",
+            help="Run test #3",
+        )
+
     def run(self) -> None:
         """Perform the command."""
 
-        if self.testing:
+        if self.options.test1:
             schedule = self.example_schedule
+        elif self.options.test2:
+            schedule = self.example_schedule2
+        elif self.options.test3:
+            schedule = self.example_schedule3
         else:
             schedule = self.get_schedule()
             if self.cli.options.verbose:
-                pprint(schedule)
+                for line in schedule:
+                    print("#", line)
 
+        _last_shift = None
         for shift in self.parse_schedule(schedule):
+            if _last_shift and shift == _last_shift:
+                # Shifts are doubled for Today.
+                print("# ignoring repeated shift.")
+                continue
+            _last_shift = shift
+
             print(
                 "gcalcli",
                 "add",
@@ -186,42 +215,93 @@ class KrogerMyTimeCmd(BaseCmd):
         "12:00 PM-4:30 PM [4.50]",
     ]
 
-    def parse_schedule(self, schedule: ["str"]) -> [Shift]:
-        """Returns a list of `Shift`s from the given `schedule`."""
+    example_schedule2 = [
+        "Thu",
+        "4",
+        "Today",
+        "Independence Day",
+        "Independence Day for Calc",
+        "3:00 PM-7:30 PM [4.50]",
+        "3:00 PM-7:30 PM [4.50]",
+        "0660/03/00054/E-Commerce/E-Commerce Clerk",
+        "Fri",
+        "5",
+        "12:00 PM-5:00 PM [5.00]",
+        "Sat",
+        "6",
+        "You have nothing planned.",
+        "Sun",
+        "7",
+        "You have nothing planned.",
+        "Mon",
+        "8",
+        "You have nothing planned.",
+        "Tue",
+        "9",
+        "You have nothing planned.",
+        "Wed",
+        "10",
+        "You have nothing planned.",
+    ]
 
-        shifts = []
+    example_schedule3 = [
+        "Sat",
+        "6",
+        "Today",
+        "You have nothing planned.",
+        "Sun",
+        "7",
+        "You have nothing planned.",
+        "Mon",
+        "8",
+        "12:00 PM-5:00 PM [5.00]",
+        "Tue",
+        "9",
+        "You have nothing planned.",
+        "Wed",
+        "10",
+        "You have nothing planned.",
+        "Thu",
+        "11",
+        "2:30 PM-7:30 PM [5.00]",
+        "Fri",
+        "12",
+        "12:00 PM-6:00 PM [6.00]",
+    ]
+
+    def parse_schedule(self, schedule: ["str"]) -> [Shift]:
+        """Yields `Shift`s from the given `schedule`."""
+
+        # The schedule always begins with today.
         _t = localtime()
         year, mon = _t.tm_year, _t.tm_mon
 
-        first = True
+        _first = True
         while schedule:
             dayname = schedule.pop(0)
             daynum = int(schedule.pop(0))
-            timestr = schedule.pop(0)
-            if timestr == "Today":
-                timestr = schedule.pop(0)
-                if schedule[0] == timestr:
-                    schedule.pop(0)  # timestr repeats, then
-                    schedule.pop(0)  # "0660/03/00054/E-Commerce/E-Commerce Clerk"
 
-            print(f"# {dayname!r} {daynum!r} {timestr!r}")
-
-            if not first and daynum == 1:  # new month.
+            if not _first and daynum == 1:  # new month.
                 if mon < 12:
                     mon += 1
                 else:
                     mon = 1
                     year += 1
+            _first = False
             date = mktime((year, mon, daynum, 0, 0, 0, 0, 0, 0))
-            first = False
 
-            while timestr != "You have nothing planned.":
-                try:
-                    shifts.append(Shift(date, dayname, daynum, timestr))
-                    break
-                except RuntimeError:
-                    # Perhaps a holiday message, like: "Independence Day".
-                    timestr = schedule.pop(0)
-                    print(f"# {dayname!r} {daynum!r} {timestr!r}")
-
-        return shifts
+            while schedule and schedule[0] not in [
+                "Sun",
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+            ]:
+                timestr = schedule.pop(0)
+                if timestr == "Today":
+                    continue
+                print(f"# {dayname!r} {daynum!r} {timestr!r}")
+                with contextlib.suppress(ValueError):
+                    yield Shift(date, dayname, daynum, timestr)
